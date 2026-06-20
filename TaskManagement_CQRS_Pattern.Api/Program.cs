@@ -1,4 +1,6 @@
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using TaskManagement_CQRS_Pattern.Api.Behaviors;
 using TaskManagement_CQRS_Pattern.Db.AppDbContextModels;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,9 +23,32 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
 builder.Services.AddMediatR(config =>
 {
     config.RegisterServicesFromAssembly(typeof(Program).Assembly);
+    config.AddOpenBehavior(typeof(ValidationBehavior<,>));
 });
 
+builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
+
 var app = builder.Build();
+
+app.Use(async (context, next) =>
+{
+    try
+    {
+        await next();
+    }
+    catch (FluentValidation.ValidationException ex)
+    {
+        context.Response.StatusCode = StatusCodes.Status400BadRequest;
+        await context.Response.WriteAsJsonAsync(new
+        {
+            errors = ex.Errors.Select(e => new
+            {
+                field = e.PropertyName,
+                message = e.ErrorMessage
+            })
+        });
+    }
+});
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

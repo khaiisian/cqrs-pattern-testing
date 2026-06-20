@@ -32,6 +32,7 @@ public class TasksController : ControllerBase
     public async Task<IActionResult> GetById(int id)
     {
         var task = await _mediator.Send(new GetTaskByIdQuery(id));
+        if (task is null) return NotFound("No item found");
         return Ok(task);
     }
 

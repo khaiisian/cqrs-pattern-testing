@@ -6,7 +6,7 @@ namespace TaskManagement_CQRS_Pattern.Api.Features.Tasks.Commands.UpdateTask;
 
 public record UpdateTaskCommand(int id, UpdateTaskDto updateTaskDto) : IRequest<string>;
 
-public record UpdateTaskHandler: IRequestHandler<UpdateTaskCommand, string>
+public class UpdateTaskHandler: IRequestHandler<UpdateTaskCommand, string>
 {
     private readonly AppDbContext _appDbContext;
 
@@ -17,7 +17,7 @@ public record UpdateTaskHandler: IRequestHandler<UpdateTaskCommand, string>
 
     public async Task<string> Handle(UpdateTaskCommand request, CancellationToken ct) 
     {
-        var item = await _appDbContext.TaskItems.FirstOrDefaultAsync(x => x.Id == request.id);
+        var item = await _appDbContext.TaskItems.FirstOrDefaultAsync(x => x.Id == request.id, ct);
 
         if (item is null) return "No item data found.";
 
@@ -35,7 +35,7 @@ public record UpdateTaskHandler: IRequestHandler<UpdateTaskCommand, string>
             item.Iscompleted = request.updateTaskDto.Iscompleted.Value;
         }
 
-        int result = await _appDbContext.SaveChangesAsync();
+        int result = await _appDbContext.SaveChangesAsync(ct);
         var message = result > 0 ? "Update successful." : "Update failed.";
 
         return message;

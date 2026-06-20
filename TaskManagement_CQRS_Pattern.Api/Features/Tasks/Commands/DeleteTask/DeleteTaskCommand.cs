@@ -17,7 +17,7 @@ public class DeleteTaskHanlder: IRequestHandler<DeleteTaskCommand, string>
 
     public async Task<string> Handle(DeleteTaskCommand request, CancellationToken ct)
     {
-        var item = await _appDbContext.TaskItems.FirstOrDefaultAsync(x => x.Id == request.id);
+        var item = await _appDbContext.TaskItems.FirstOrDefaultAsync(x => x.Id == request.id, ct);
         
         if (item is null) return "No item found";
         

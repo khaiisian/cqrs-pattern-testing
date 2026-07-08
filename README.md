@@ -80,8 +80,3 @@ HTTP request -> TasksController -> _mediator.Send(command/query)
 2. Check the connection string in `Api/appsettings.json`.
 3. Set the `.Api` project as startup and press F5 — Swagger opens automatically.
 
-## TODO
-
-- [ ] FluentValidation + validation behavior
-- [ ] Return DTOs from queries
-- [ ] Global exception handler
